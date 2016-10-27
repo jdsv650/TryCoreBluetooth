@@ -35,6 +35,9 @@
                                     <segment title="Right Flash" width="73"/>
                                     <segment title="L+R Flash"/>
                                 </segments>
+                                <connections>
+                                    <action selector="turnSignalControlPresssed:" destination="BYZ-38-t0r" eventType="valueChanged" id="NFe-Uc-Vf2"/>
+                                </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Laser Light Control" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2jc-xw-jBC">
                                 <frame key="frameInset" minX="16" minY="79" width="343" height="21"/>
@@ -51,6 +54,9 @@
                                     <segment title="Off"/>
                                     <segment title="On"/>
                                 </segments>
+                                <connections>
+                                    <action selector="laserLightControlpressed:" destination="BYZ-38-t0r" eventType="valueChanged" id="FdP-je-mp3"/>
+                                </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Red Light Control" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jD5-kI-qXb">
                                 <frame key="frameInset" minX="16" minY="137" width="343" height="21"/>
@@ -68,6 +74,9 @@
                                     <segment title="On"/>
                                     <segment title="Flash"/>
                                 </segments>
+                                <connections>
+                                    <action selector="redLightControlPressed:" destination="BYZ-38-t0r" eventType="valueChanged" id="86Y-jd-2jh"/>
+                                </connections>
                             </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
