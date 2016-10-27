@@ -416,6 +416,31 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     }
     
     
+    @IBAction func lightsOutPressed(_ sender: UIButton) {
+        
+        if peripheral == nil { print("peripheral not connected") ; return }
+        
+        // are we still connected?
+        if peripheral.state != .connected {
+            print("Peripheral is not connected")
+            self.peripheral = nil
+            return
+        }
+        
+        // did we find the characteristic to work with?
+        if lightCharacterstic == nil { return }
+        
+        // this makes more sense why the 0'd fields were not changing other light states
+        // * 0 is "ignore" the state we pass in for that particular attribute  *
+        let sendData = NSData(bytes: [0x01, 0x01, 0x00, 0x00, 0x01, 0x00] as [UInt8], length: 6)
+
+        peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
+        
+        print("DID Call Write Value with all 0's")
+
+    }
     
+    
+
 }
 
