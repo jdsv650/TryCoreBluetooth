@@ -39,7 +39,7 @@ public enum AllControl :UInt8 {
 
 
 
-class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDelegate {
+class ViewController: UIViewController, BLEManagerDelegate {
     
     @IBOutlet weak var turnSignalControl: UISegmentedControl!
     
@@ -47,8 +47,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     
     @IBOutlet weak var redLightControl: UISegmentedControl!
     
+    var didDiscoverCharacteristic = false // need more than this it's a start towards fixing the MVC masive view controller pattern
 
-    // need central (client) manager and peripheral (server)
+    let bleManager = BLEManager()
+    
+    /****
     var centralManager :CBCentralManager!
     var peripheral :CBPeripheral!
     var peripherals: Array<CBPeripheral> = Array<CBPeripheral>()
@@ -57,13 +60,23 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
 
     let serviceID  = CBUUID(string: "FFF0")
     let characteristicID = CBUUID(string: "FFF2")  // 0x not needed as prefix here
+ ***********/
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // start BLE central manager
-        centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
+       // centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
+    }
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        bleManager.delegate = self
     }
 
+    /**
     // required
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
@@ -314,9 +327,35 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         print("idUpdateNotificationStateFor")
     }
+    *****/
+    
+    func centralDidDiscoverPeripheral(isFound: Bool) {
+        print("")
+    }
+    
+    func centralDidDiscoverCharacteristic(isFound: Bool) {
+        
+        didDiscoverCharacteristic = isFound
+        
+    }
+    
+    func centralDidUpdateStatus(status: CBManagerState) {
+        print("")
+        if status == CBManagerState.poweredOn
+        {
+            
+        }
+        else
+        {
+            // inform user try again etc.....
+        }
+        
+    }
     
     
     @IBAction func turnSignalControlPresssed(_ sender: UISegmentedControl) {
+        
+        /****
         
         if peripheral == nil { print("peripheral not connected") ; return }
         
@@ -329,6 +368,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         // did we find the characteristic to work with?
         if lightCharacterstic == nil { return }
+ *******/
+        
+        if !didDiscoverCharacteristic == true
+        {
+            print("Not cnnected or can't access characeristic")
+            return
+        }
+ 
         var sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         
         switch sender.selectedSegmentIndex {
@@ -346,12 +393,21 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         }
         
-         peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
+        bleManager.writeDataToLight(sendData: sendData)
+        
+        // peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
     }
     
     
     @IBAction func laserLightControlpressed(_ sender: UISegmentedControl) {
         
+        if !didDiscoverCharacteristic == true
+        {
+            print("Not cnnected or can't access characeristic")
+            return
+        }
+        
+        /***
         if peripheral == nil { print("peripheral not connected") ; return }
 
         // are we still connected?
@@ -363,6 +419,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         // did we find the characteristic to work with?
         if lightCharacterstic == nil { return }
+ ****/
         
         var sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         
@@ -377,7 +434,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         }
         
-        peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
+        bleManager.writeDataToLight(sendData: sendData)
+       // peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
         
     }
     
@@ -385,6 +443,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     
     @IBAction func redLightControlPressed(_ sender: UISegmentedControl) {
         
+        if !didDiscoverCharacteristic == true
+        {
+            print("Not cnnected or can't access characeristic")
+            return
+        }
+        
+        /***
         if peripheral == nil { print("peripheral not connected") ; return }
         
         // are we still connected?
@@ -396,6 +461,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         // did we find the characteristic to work with?
         if lightCharacterstic == nil { return }
+ 
+  *****/
         var sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         
         switch sender.selectedSegmentIndex {
@@ -411,13 +478,23 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         }
         
-        peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
+        bleManager.writeDataToLight(sendData: sendData)
+        
+      //  peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
 
     }
     
     
     @IBAction func lightsOutPressed(_ sender: UIButton) {
         
+        
+        if !didDiscoverCharacteristic == true
+        {
+            print("Not cnnected or can't access characeristic")
+            return
+        }
+        
+        /***
         if peripheral == nil { print("peripheral not connected") ; return }
         
         // are we still connected?
@@ -428,13 +505,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         }
         
         // did we find the characteristic to work with?
-        if lightCharacterstic == nil { return }
+        if lightCharacterstic == nil { return }  ****/
         
         // this makes more sense why the 0'd fields were not changing other light states
         // * 0 is "ignore" the state we pass in for that particular attribute  *
         let sendData = NSData(bytes: [0x01, 0x01, 0x00, 0x00, 0x01, 0x00] as [UInt8], length: 6)
 
-        peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
+        bleManager.writeDataToLight(sendData: sendData)
+      //  peripheral.writeValue(sendData as Data, for: lightCharacterstic!, type: CBCharacteristicWriteType.withResponse)
         
         print("DID Call Write Value with all 0's")
 
