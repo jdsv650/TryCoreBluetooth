@@ -9,6 +9,39 @@
 import Foundation
 import CoreBluetooth
 
+// [0]
+public enum TurnLighControl :UInt8 {
+    case ignore
+    case off
+    case leftFlash
+    case rightFlash
+    case leftAndRightFlash
+}
+
+// [1]
+public enum LaserLighControl :UInt8 {
+    case ignore
+    case off
+    case on
+}
+
+// [4]
+public enum RedLightControl :UInt8 {
+    case ignore
+    case off
+    case on
+    case flash
+}
+
+// [5]  seems to turn all lights on ?????????????????????? not documented ?????????/
+public enum AllControl :UInt8 {
+    // Only checked with 0x02 in this position and turns all on
+    case ignore
+    case off
+    case on
+    case flash
+}
+
 
 @objc protocol BLEManagerDelegate {
     @objc optional func centralDidUpdateStatus(status: CBManagerState)
@@ -131,8 +164,7 @@ class BLEManager :NSObject, CBPeripheralDelegate, CBCentralManagerDelegate
          self.peripheral = peripheral
          self.peripheral.delegate = self
          ****/
-        
-        let theService :[CBUUID] = [serviceID]
+        //let theService :[CBUUID] = [serviceID]
         
         // use [CBUDID] to limit services
         peripheral.discoverServices(nil)
@@ -195,10 +227,7 @@ class BLEManager :NSObject, CBPeripheralDelegate, CBCentralManagerDelegate
         
         if let characteristics = service.characteristics
         {
-            var enableValue :UInt8 = 2 // on
-            
             // var sendData = NSData(bytes: [0x00, 0x00, 0x02, 0x00, 0x00, 0x00] as [UInt8], length: 6)
-            
             // [0] turn signal
             // [1] laser light
             // [2]nothing
@@ -206,45 +235,19 @@ class BLEManager :NSObject, CBPeripheralDelegate, CBCentralManagerDelegate
             // [4] is RED Light
             // [5] all steady on 0x02
             
-            
-            var sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x02] as [UInt8], length: 6)
-            
-            
-            //   let enableBytes = NSData(bytes: &enableValue, length: MemoryLayout<UInt8>.size)
-            
             for characteristic in characteristics
             {
                 if characteristic.uuid == characteristicID
                 {
                     lightCharacterstic = characteristic
                     delegate?.centralDidDiscoverCharacteristic?(isFound: true)
-                    // peripheral.readValue(for: characteristic)
-                    
-                    
-                    // peripheral.writeValue(sendData as Data, for: characteristic, type: CBCharacteristicWriteType.withResponse)
-                    
                 }
                 else
                 {
-                        delegate?.centralDidDiscoverPeripheral?(isFound: false)
+                    delegate?.centralDidDiscoverPeripheral?(isFound: false)
                 }
-                
-                
             }
         }
-        
-        
-        /****
-        // setNotifyValue here to get changes to val privided in didUpdateValueForCharaterstic delegate method or readValue or writeValue
-        // -- SOME methods/properties of interest
-        // peripheral.readValue
-        // peripheral.writeValue
-        // peripheral.setNotifyValue
-         peripheral.writeValue(data, for: cbchar, type: writetype)
-         peripheral.readValue(for: <#T##CBCharacteristic#>)
-         peripheral.setNotifyValue(<#T##enabled: Bool##Bool#>, for: <#T##CBCharacteristic#>)
-         peripheral.state
-         *****/
     }
 
     
