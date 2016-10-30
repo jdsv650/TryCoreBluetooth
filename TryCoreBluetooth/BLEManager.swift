@@ -54,6 +54,8 @@ public enum AllControl :UInt8 {
 class BLEManager :NSObject, CBPeripheralDelegate, CBCentralManagerDelegate
 {
     
+    
+    
     var delegate : BLEManagerDelegate?
     
     // need central (client) manager and peripheral (server)
@@ -206,8 +208,21 @@ class BLEManager :NSObject, CBPeripheralDelegate, CBCentralManagerDelegate
         }
     }
     
+    
+    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        if error != nil {
+            print(error?.localizedDescription)
+        }
+        else
+        {
+            print("Did Write TO Device for characterstic = \(characteristic)")
+            print("Did Write value TO Device for characterstic = \(characteristic.value)")
+        }
+    }
+    
     // called after we setNotifyValue true on a characteristic or read
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
         print("did update value for")
         
         print("characteristic.value = \(characteristic.value![4])")
@@ -244,7 +259,8 @@ class BLEManager :NSObject, CBPeripheralDelegate, CBCentralManagerDelegate
                 }
                 else
                 {
-                    delegate?.centralDidDiscoverPeripheral?(isFound: false)
+                    // perip oops
+                  //  delegate?.centralDidDiscoverPeripheral?(isFound: false)
                 }
             }
         }

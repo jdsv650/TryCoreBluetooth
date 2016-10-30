@@ -1,8 +1,29 @@
 //  ViewController.swift
 //  TryCoreBluetooth
 
+/****
+ CoreMotion Event frequency (Hz) - Usage
+ Usage
+ 10–20
+ Suitable for determining a device’s current orientation vector.
+ 30–60
+ Suitable for games and other apps that use the accelerometer for real-time user input.
+ 70–100
+ Suitable for apps that need to detect high-frequency motion. For example, you might use this interval to detect the user hitting the device or shaking it very quickly.
+ 
+ let fastestUpdate = 0.01  --- 100hz
+ 
+  // 0.10s  10 hz
+  // 0.05s  20 hz
+  // 0.02s  50 hz
+  // 0.01s  100hz
+ ****/
+
+
+
 import UIKit
 import CoreBluetooth
+import CoreMotion
 
 class ViewController: UIViewController, BLEManagerDelegate {
     
@@ -10,13 +31,91 @@ class ViewController: UIViewController, BLEManagerDelegate {
     @IBOutlet weak var laserLightControl: UISegmentedControl!
     @IBOutlet weak var redLightControl: UISegmentedControl!
     
+    @IBOutlet weak var coloredBoxLabel: UILabel!
+    
+    
     var didDiscoverCharacteristic = false // need more than this it's a start towards fixing the MVC masive view controller pattern
 
     let bleManager = BLEManager() // * starts the CB manager *
+    let motionManager = CMMotionManager()
+    
+  //  let fastestUpdate = 0.01
+    var refreshRate = 0.01
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+    }
+    
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
+        
+        coloredBoxLabel.isHidden = true
+        
+       // motionManager.deviceMotion?.userAcceleration.x
+        
+        if motionManager.isGyroAvailable
+        {
+            motionManager.gyroUpdateInterval = refreshRate
+            
+            let queue = OperationQueue.main
+            
+            motionManager.startGyroUpdates(to: queue) {
+                (data, error) in
+                
+                if error != nil
+                {
+                    print(error?.localizedDescription)
+                    return
+                }
+                
+                if let theData = data
+                {
+                    print("x = \(theData.rotationRate.x)")
+                    print("y = \(theData.rotationRate.y)")
+                    print("z = \(theData.rotationRate.z)")
+                    
+                    // hmmm do something based on this
+                }
+            }
+         }
+        
+    
+        if motionManager.isAccelerometerAvailable
+        {
+            motionManager.accelerometerUpdateInterval = refreshRate
+            
+            let queue = OperationQueue.main
+            motionManager.startAccelerometerUpdates(to: queue) {
+                (data, error) in
+                
+                if error != nil
+                {
+                    print(error?.localizedDescription)
+                    return
+                }
+                
+                if let theData = data
+                {
+                    
+                    print("x = \(theData.acceleration.x)")
+                    print("y = \(theData.acceleration.y)")
+                    print("z = \(theData.acceleration.z)")
+                    
+                    // do soemthing here
+                    if theData.acceleration.x < -2.5
+                        || theData.acceleration.y < -2.5
+                        || theData.acceleration.y > 2.5
+                    {
+                        self.coloredBoxLabel.isHidden = false
+                    }
+        
+                    
+                }
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -211,6 +310,13 @@ class ViewController: UIViewController, BLEManagerDelegate {
 
     }
     
+    
+    
+    @IBAction func removePressed(_ sender: UIButton)
+    {
+        coloredBoxLabel.isHidden = true
+        
+    }
     
 
 }
