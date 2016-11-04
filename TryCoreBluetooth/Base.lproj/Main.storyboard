@@ -73,6 +73,8 @@
                                     <segment title="Off"/>
                                     <segment title="On"/>
                                     <segment title="Flash"/>
+                                    <segment title="Brake"/>
+                                    <segment title="Br OFF"/>
                                 </segments>
                                 <connections>
                                     <action selector="redLightControlPressed:" destination="BYZ-38-t0r" eventType="valueChanged" id="86Y-jd-2jh"/>

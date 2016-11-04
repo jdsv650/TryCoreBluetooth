@@ -44,6 +44,8 @@ class ViewController: UIViewController, BLEManagerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        activateProximitySensor()
 
     }
     
@@ -236,7 +238,8 @@ class ViewController: UIViewController, BLEManagerDelegate {
     }
     
     
-    
+    var isRedLightOn :UInt8 = 0x01
+
     @IBAction func redLightControlPressed(_ sender: UISegmentedControl) {
         
         if !didDiscoverCharacteristic == true
@@ -259,17 +262,26 @@ class ViewController: UIViewController, BLEManagerDelegate {
         if lightCharacterstic == nil { return }
  
   *****/
+        
         var sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         
         switch sender.selectedSegmentIndex {
-        case 0:
+        case 0: // ignore
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
-        case 1:
-            sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x01, 0x00] as [UInt8], length: 6)
-        case 2:
+        case 1: //off
+                sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x01, 0x00] as [UInt8], length: 6)
+                isRedLightOn = 0x01
+        case 2: // on
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x02, 0x00] as [UInt8], length: 6)
-        case 3:
+            isRedLightOn = 0x02
+        case 3: // flash
+            isRedLightOn = 0x02
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x03, 0x00] as [UInt8], length: 6)
+        case 4:
+            // brake light on
+            sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x64, 0x02, 0x00] as [UInt8], length: 6)
+        case 5: //brake light off
+                sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x32, isRedLightOn, 0x00] as [UInt8], length: 6)
         default:
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         }
@@ -318,6 +330,21 @@ class ViewController: UIViewController, BLEManagerDelegate {
         
     }
     
+    
+    func proximityChanged(notification: NSNotification) {
+        if let device = notification.object as? UIDevice {
+            print("\(device) detected!")
+        }
+    }
+    
+    func activateProximitySensor() {
+        let device = UIDevice.current
+        device.isProximityMonitoringEnabled = true
+        if device.isProximityMonitoringEnabled {
+            NotificationCenter.default.addObserver(self, selector: Selector(("proximityChanged:")), name: NSNotification.Name(rawValue: "UIDeviceProximityStateDidChangeNotification"), object: device)
+        }
+    }
+
 
 }
 
