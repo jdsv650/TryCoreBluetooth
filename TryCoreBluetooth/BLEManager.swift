@@ -73,6 +73,8 @@ class BLEManager :NSObject, CBPeripheralDelegate, CBCentralManagerDelegate
         super.init()
         
         centralManager = CBCentralManager(delegate: self, queue: nil)
+        
+        centralManager.stopScan()
     }
     
     

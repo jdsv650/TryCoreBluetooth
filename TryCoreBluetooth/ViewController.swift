@@ -25,7 +25,7 @@ import UIKit
 import CoreBluetooth
 import CoreMotion
 
-class ViewController: UIViewController, BLEManagerDelegate {
+class ViewController: UIViewController, BLEManagerDelegate, CMBrakeLightManagerDelegate {
     
     @IBOutlet weak var turnSignalControl: UISegmentedControl!
     @IBOutlet weak var laserLightControl: UISegmentedControl!
@@ -45,19 +45,29 @@ class ViewController: UIViewController, BLEManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        activateProximitySensor()
+      //  activateProximitySensor()
 
     }
     
+    var old : CMAccelerometerData?
+
+    
+    var oldAcceleration: CMDeviceMotion?
+    
+    
+    var brakeLightManager = CMBrakeLightManager()
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        brakeLightManager.delegate = self
+        bleManager.delegate = self
         
         coloredBoxLabel.isHidden = true
         
        // motionManager.deviceMotion?.userAcceleration.x
         
+        /***
         if motionManager.isGyroAvailable
         {
             motionManager.gyroUpdateInterval = refreshRate
@@ -75,16 +85,17 @@ class ViewController: UIViewController, BLEManagerDelegate {
                 
                 if let theData = data
                 {
-                    print("x = \(theData.rotationRate.x)")
-                    print("y = \(theData.rotationRate.y)")
-                    print("z = \(theData.rotationRate.z)")
+                 //   print("x = \(theData.rotationRate.x)")
+                 //   print("y = \(theData.rotationRate.y)")
+                 //   print("z = \(theData.rotationRate.z)")
                     
                     // hmmm do something based on this
                 }
             }
          }
-        
-    
+ *****/
+ 
+        /**
         if motionManager.isAccelerometerAvailable
         {
             motionManager.accelerometerUpdateInterval = refreshRate
@@ -101,7 +112,6 @@ class ViewController: UIViewController, BLEManagerDelegate {
                 
                 if let theData = data
                 {
-                    
                     print("x = \(theData.acceleration.x)")
                     print("y = \(theData.acceleration.y)")
                     print("z = \(theData.acceleration.z)")
@@ -115,16 +125,174 @@ class ViewController: UIViewController, BLEManagerDelegate {
                     }
         
                     
+                    let g = 0.0127464527
+                    
+                    if self.old == nil
+                    {
+                        self.old = theData
+                        return
+                    }
+                    
+                    let t = theData.timestamp
+                    
+                    // get the interval
+                    let inter = t - (self.old?.timestamp)!
+                    
+                    if inter >= 4 // 4 seconds maybe try three as Mickey suggested
+                    {
+                        // print("Once every 4 sseconds?????") YEP!!!!
+                        // 1st fabs value and then check > our found g val
+                        
+                        // first time in first x was OFF
+                        
+                        // ------------------ ThIS IS A BUST In Devic eManager----------------------------------
+                        // READINGS SPIKE from 0.000XXXX to 9.xxxxxxxx TRY Again
+                        let diffX = fabs((self.old?.acceleration.x)! - theData.acceleration.x)
+                        
+                        let diffY = fabs((self.old?.acceleration.y)! - theData.acceleration.y)
+                        
+                        let diffZ = fabs((self.old?.acceleration.z)! - theData.acceleration.z)
+                        
+                        
+                        print("diffX = \(diffX)")
+                        print("diffY = \(diffY)")
+                        print("diffZ = \(diffZ)")
+                        
+                        if diffX > g { print("--------------- BRAKE OM X -------------------") }
+                        if diffY > g { print("--------------- BRAKE OM Y -------------------") }
+                        
+                        if diffZ > g { print("--------------- BRAKE OM Z -------------------") }
+                        //
+                        
+                        self.old = nil
+                    }
+                
+                
                 }
             }
+        } ****/
+        
+            /***
+         
+            if motionManager.isDeviceMotionAvailable
+            {
+                motionManager.deviceMotionUpdateInterval = refreshRate
+                
+                let queue = OperationQueue.main
+                motionManager.startDeviceMotionUpdates(to: queue) {
+                    (data, error) in
+                    
+                    if error != nil
+                    {
+                        print(error?.localizedDescription)
+                        return
+                    }
+                    
+                    if let newAcceleration = data
+                    {
+                      //  print("x = \(newAcceleration.userAcceleration.x)")
+                      //  print("y = \(newAcceleration.userAcceleration.y)")
+                      //  print("z = \(newAcceleration.userAcceleration.z)")
+                   
+                       // print("gravity x = \(newAcceleration.gravity.x)")
+                       // print("gravity y = \(newAcceleration.gravity.y)")
+                       // print("gravity z = \(newAcceleration.gravity.z)")
+
+                        
+                        // do soemthing here
+                      //  if newAcceleration.userAcceleration.x > 2 || newAcceleration.userAcceleration.x < -2
+                           // || newAcceleration.userAcceleration.y > 2 || newAcceleration.userAcceleration.z > 2 || newAcceleration.userAcceleration.z < -2
+                          
+                        //{
+                          //  self.coloredBoxLabel.isHidden = false
+                       // }
+ 
+                        // Google this 0.5 m/s per 4 second to g  (to get next line)
+                        // (0.5 (m / s)) per (4 second) =  0.0127464527 g
+                        
+                        let g = 0.0127464527
+                        
+                        if self.oldAcceleration == nil
+                        {
+                            self.oldAcceleration = newAcceleration
+                            return
+                        }
+
+                        let t = newAcceleration.timestamp
+                        
+                        // get the interval
+                        let inter = t - (self.oldAcceleration?.timestamp)!
+                        
+                       if inter >= 4 // 4 seconds maybe try three as Mickey suggested
+                        {
+                           // print("Once every 4 sseconds?????") YEP!!!!
+                            // 1st fabs value and then check > our found g val
+                            
+                            // first time in first x was OFF
+                            
+                            // ------------------ ThIS IS A BUST ----------------------------------
+                            // READINGS SPIKE from 0.000XXXX to 9.xxxxxxxx TRY Again
+                             let diffX = fabs((self.oldAcceleration?.userAcceleration.x)! - newAcceleration.userAcceleration.x)
+                            
+                             let diffY = fabs((self.oldAcceleration?.userAcceleration.y)! - newAcceleration.userAcceleration.y)
+                            
+                             let diffZ = fabs((self.oldAcceleration?.userAcceleration.z)! - newAcceleration.userAcceleration.z)
+
+                            
+                            print("diffX = \(diffX)")
+                            print("diffY = \(diffY)")
+
+                            print("diffZ = \(diffZ)")
+
+                            if diffX > 2 { print("--------------- BRAKE OM X -------------------") }
+                            if diffY > 2 { print("--------------- BRAKE OM Y -------------------") }
+                            
+                            if diffZ > 2 { print("--------------- BRAKE OM Z -------------------") }
+                          //
+                            
+                            self.oldAcceleration = nil
+                        }
+                    }
+
+
+
+            }
+
+        }
+         ******/
+
+
+    }
+    
+    
+    func brakeLightStatusChanged(isBrakeOn: Bool) {
+        
+        if isBrakeOn
+        {
+            coloredBoxLabel.backgroundColor = UIColor.red
+            coloredBoxLabel.isHidden  = false
+            var sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x64, 0x02, 0x00] as [UInt8], length: 6)
+            
+            let result = bleManager.writeDataToLight(sendData: sendData)
+            if !result { print("write failed") }
+            
+        }
+        else
+        {
+            coloredBoxLabel.backgroundColor = UIColor.white
+            var sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
+            
+            let result = bleManager.writeDataToLight(sendData: sendData)
+            if !result { print("write failed") }
         }
     }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
         // optional delegate funcs to stay informed of Bluetooth status
-        bleManager.delegate = self
+    //    bleManager.delegate = self
     }
 
     func centralDidDiscoverPeripheral(isFound: Bool) {
@@ -191,8 +359,8 @@ class ViewController: UIViewController, BLEManagerDelegate {
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         }
         
-        let result = bleManager.writeDataToLight(sendData: sendData)
-        if !result { print("write failed") }
+  //      let result = bleManager.writeDataToLight(sendData: sendData)
+    //    if !result { print("write failed") }
         
     }
     
@@ -232,8 +400,8 @@ class ViewController: UIViewController, BLEManagerDelegate {
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         }
         
-        let result = bleManager.writeDataToLight(sendData: sendData)
-        if !result { print("write failed") }
+   //     let result = bleManager.writeDataToLight(sendData: sendData)
+     //   if !result { print("write failed") }
    
     }
     
@@ -286,8 +454,8 @@ class ViewController: UIViewController, BLEManagerDelegate {
             sendData = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 6)
         }
         
-        let result = bleManager.writeDataToLight(sendData: sendData)
-        if !result { print("write failed") }
+    //    let result = bleManager.writeDataToLight(sendData: sendData)
+     //   if !result { print("write failed") }
     }
     
     
@@ -317,8 +485,8 @@ class ViewController: UIViewController, BLEManagerDelegate {
         // * 0 is "ignore" the state we pass in for that particular attribute  *
         let sendData = NSData(bytes: [0x01, 0x01, 0x00, 0x00, 0x01, 0x00] as [UInt8], length: 6)
 
-        let result = bleManager.writeDataToLight(sendData: sendData)
-        if !result { print("write failed") }
+      //  let result = bleManager.writeDataToLight(sendData: sendData)
+       // if !result { print("write failed") }
 
     }
     
@@ -330,7 +498,7 @@ class ViewController: UIViewController, BLEManagerDelegate {
         
     }
     
-    
+    /***
     func proximityChanged(notification: NSNotification) {
         if let device = notification.object as? UIDevice {
             print("\(device) detected!")
@@ -344,7 +512,7 @@ class ViewController: UIViewController, BLEManagerDelegate {
             NotificationCenter.default.addObserver(self, selector: Selector(("proximityChanged:")), name: NSNotification.Name(rawValue: "UIDeviceProximityStateDidChangeNotification"), object: device)
         }
     }
-
+*****/
 
 }
 

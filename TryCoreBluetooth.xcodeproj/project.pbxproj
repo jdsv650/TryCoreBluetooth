@@ -13,6 +13,7 @@
 		1AA886EF1DBECE24003B2E4A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1AA886ED1DBECE24003B2E4A /* Main.storyboard */; };
 		1AA886F11DBECE24003B2E4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1AA886F01DBECE24003B2E4A /* Assets.xcassets */; };
 		1AA886F41DBECE24003B2E4A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1AA886F21DBECE24003B2E4A /* LaunchScreen.storyboard */; };
+		1AC860751DD79A580018FEC4 /* CMBrakeLightManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC860741DD79A580018FEC4 /* CMBrakeLightManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		1AA886F01DBECE24003B2E4A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1AA886F31DBECE24003B2E4A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1AA886F51DBECE24003B2E4A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1AC860741DD79A580018FEC4 /* CMBrakeLightManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CMBrakeLightManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,6 +42,7 @@
 		1AA886DD1DBECE24003B2E4A = {
 			isa = PBXGroup;
 			children = (
+				1AC860741DD79A580018FEC4 /* CMBrakeLightManager.swift */,
 				1AA886E81DBECE24003B2E4A /* TryCoreBluetooth */,
 				1AA886E71DBECE24003B2E4A /* Products */,
 			);
@@ -140,6 +143,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1AC860751DD79A580018FEC4 /* CMBrakeLightManager.swift in Sources */,
 				1AA886EC1DBECE24003B2E4A /* ViewController.swift in Sources */,
 				1A6394911DC2C4BB000A6EF8 /* BLEManager.swift in Sources */,
 				1AA886EA1DBECE24003B2E4A /* AppDelegate.swift in Sources */,
